@@ -42,9 +42,9 @@ app.locals.moment = moment; // this makes moment available as a variable in ever
 
 // create the database yelp_camp with the db connection 
 // local database connection
-mongoose.connect('mongodb://localhost/yelp_camp');
+// mongoose.connect('mongodb://localhost/yelp_camp');
 // mLab database connection
-// mongoose.connect('mongodb://lino:lino01@ds153422.mlab.com:53422/yelpcamp_lino');
+mongoose.connect('mongodb://lino:lino01@ds153422.mlab.com:53422/yelpcamp_lino');
 //  get notified if we connect successfully or if a connection error occurs:
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -143,11 +143,11 @@ app.use('/campgrounds/:id/comments', commentRoutes);
 app.use(indexRoutes);
 
 // // bij cloud 9 met je dit gebruiken, dit is geen hardcoded
-// app.listen(process.env.PORT, process.env.IP, function () {
-//     console.log('Server has started for YelpCamp on Heroku!')
-// });
+app.listen(process.env.PORT, process.env.IP, function () {
+    console.log('Server has started for YelpCamp on Heroku!')
+});
 
 // lokaal gebruiken
-app.listen('3000', function () {
-    console.log('The YelpCamp Server has started!');
-});
+// app.listen('3000', function () {
+//     console.log('The YelpCamp Server has started!');
+// });

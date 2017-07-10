@@ -5,6 +5,7 @@ var express = require('express');
 var router = express.Router();
 var Campground = require('../models/campground');
 var middleware = require('../middleware'); //index.js is de default file where express is looking for
+var geocoder = require('geocoder');
 
 
 //INDEX - show all campgrounds
@@ -40,44 +41,50 @@ router.get('/', function (req, res) {
 });
 // convention to have the post method (add campgrounds) the same name as get the campgrounds
 
-//CREATE - add new campground to DB
+// CREATE - add new campground to DB
 router.post('/', middleware.isLoggedIn, function (req, res) {
     // res.send('post werkt.')
     // get data from form
     var name = req.body.name;
     var image = req.body.image;
-    var location = req.body.location;
     var description = req.body.description;
     // create a new object with username and id and add this to the newCampground object.
     var author = {
         id: req.user._id,
         username: req.user.username
     }
-    var newCampground = {
-        name: name,
-        image: image,
-        location: location,
-        description: description,
-        author: author
-    }
-    // add username to the new created campground
-    // console.log('###########' + req.user);
-    // newCampground.author.id = req.user._id;
-    // newCampground.author.username = req.user.username;
-    // console.log('this is the new campground ' + newCampground);
-    // newCampground.save();
-    // add to campground array
-    Campground.create(newCampground, function (err, newCreatedCampground) {
-        if (err) {
-            console.log(err)
-        } else {
-            // console.log('*********** ' + newCreatedCampground)
-            // redirect to campgrounds page
-            req.flash('success', 'Successfully created a campground!');
-            res.redirect('/campgrounds')
+    geocoder.geocode(req.body.location, function (err, data) {
+        var lat = data.results[0].geometry.location.lat;
+        var lng = data.results[0].geometry.location.lng;
+        var location = data.results[0].formatted_address;
+        var newCampground = {
+            name: name,
+            image: image,
+            location: location,
+            lat: lat,
+            lng: lng,
+            description: description,
+            author: author
         }
+        // add username to the new created campground
+        // console.log('###########' + req.user);
+        // newCampground.author.id = req.user._id;
+        // newCampground.author.username = req.user.username;
+        // console.log('this is the new campground ' + newCampground);
+        // newCampground.save();
+        // add to campground array
+        Campground.create(newCampground, function (err, newCreatedCampground) {
+            if (err) {
+                console.log(err)
+            } else {
+                // console.log('*********** ' + newCreatedCampground)
+                // redirect to campgrounds page
+                req.flash('success', 'Successfully created a campground!');
+                res.redirect('/campgrounds')
+            }
+        });
     });
-})
+});
 // convention to have the GET method (new campgrounds) with the campgrounds/new format.
 // this is the form to add a new campground.
 
@@ -131,7 +138,21 @@ router.get('/:id/edit', middleware.checkCampgroundOwnership, function (req, res)
 router.put('/:id', middleware.checkCampgroundOwnership, function (req, res) {
     // 1. find and update the correct campground
     // findByIdAndUpdate (id, newData, callback)
-    Campground.findByIdAndUpdate(req.params.id, req.body.campground, function (err, updateCampground) {
+    var lat = data.results[0].geometry.location.lat;
+    var lng = data.results[0].geometry.location.lng;
+    var location = data.results[0].formatted_address;
+    var newData = {
+        name: req.body.name,
+        image: req.body.image,
+        description: req.body.description,
+        cost: req.body.cost,
+        location: location,
+        lat: lat,
+        lng: lng
+    };
+    Campground.findByIdAndUpdate(req.params.id, {
+        $set: newData
+    }, function (err, updateCampground) {
         if (err) {
             console.log(err)
             res.redirect('/campgrounds');
