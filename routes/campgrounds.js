@@ -9,19 +9,34 @@ var middleware = require('../middleware'); //index.js is de default file where e
 
 //INDEX - show all campgrounds
 router.get('/', function (req, res) {
-    console.log('Camground page!');
-    // get all the campgrounds from the DB!
-    Campground.find({}, function (err, allCampgrounds) {
-        if (err) {
-            console.log(err)
-        } else {
-            res.render('campgrounds/index', {
-                campgrounds: allCampgrounds
-            });
-        }
-    })
-    // res.render('campgrounds', {campgrounds: campgrounds});
-
+    if (req.query.search) {
+        var regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        // eval(require('locus'));
+        Campground.find({
+            name: regex
+        }, function (err, allCampgrounds) {
+            if (err) {
+                console.log(err)
+            } else {
+                res.render('campgrounds/index', {
+                    campgrounds: allCampgrounds
+                });
+            }
+        });
+    } else {
+        console.log('Camground page!');
+        // get all the campgrounds from the DB!
+        Campground.find({}, function (err, allCampgrounds) {
+            if (err) {
+                console.log(err)
+            } else {
+                res.render('campgrounds/index', {
+                    campgrounds: allCampgrounds
+                });
+            }
+        });
+        // res.render('campgrounds', {campgrounds: campgrounds});
+    }
 });
 // convention to have the post method (add campgrounds) the same name as get the campgrounds
 
@@ -138,5 +153,9 @@ router.delete('/:id', middleware.checkCampgroundOwnership, function (req, res) {
         }
     });
 });
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
 
 module.exports = router;
