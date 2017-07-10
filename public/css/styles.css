@@ -37,6 +37,14 @@
 }
 
 
+/* Google Maps */
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+
 /*
 #show_comment_block {
     margin-bottom: 10px;

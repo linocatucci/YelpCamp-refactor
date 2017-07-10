@@ -46,6 +46,7 @@ router.post('/', middleware.isLoggedIn, function (req, res) {
     // get data from form
     var name = req.body.name;
     var image = req.body.image;
+    var location = req.body.location;
     var description = req.body.description;
     // create a new object with username and id and add this to the newCampground object.
     var author = {
@@ -55,6 +56,7 @@ router.post('/', middleware.isLoggedIn, function (req, res) {
     var newCampground = {
         name: name,
         image: image,
+        location: location,
         description: description,
         author: author
     }
